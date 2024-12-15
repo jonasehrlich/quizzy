@@ -1,0 +1,26 @@
+name: Publish Python distributions to PyPI
+on:
+  push:
+    tags:
+      - v[0-9]+.[0-9]+.[0-9]+
+jobs:
+  pypi-publish:
+    name: Upload to PyPI
+    runs-on: ubuntu-latest
+    permissions:
+      # For PyPI's trusted publishing.
+      id-token: write
+    steps:
+      - name: "Install uv"
+        uses: astral-sh/setup-uv@v4
+        with:
+          # Install a specific version of uv.
+          version: "0.5.9"
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+      - name: Lint with ruff
+        run: uv run ruff check --target-version=py310 .
+      - name: Build Python distributions
+        run: uv build
+      - name: Publish to PyPI
+        run: uv publish -v --trusted-publishing always
