@@ -1,5 +1,6 @@
 from quizzy.app import QuizzyApp
 
+
 def main() -> None:
     QuizzyApp().run()
 

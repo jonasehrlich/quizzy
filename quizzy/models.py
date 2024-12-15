@@ -4,7 +4,7 @@ import pathlib
 from typing import Self
 
 import yaml
-from pydantic import model_validator, Field
+from pydantic import Field, model_validator
 from pydantic.dataclasses import dataclass
 
 
@@ -18,6 +18,7 @@ class Team:
 
     def id(self) -> str:
         return self.name.replace(" ", "_").lower()
+
 
 @dataclass
 class Question:

@@ -3,7 +3,8 @@ from __future__ import annotations
 import argparse
 import pathlib
 
-from textual import app, widgets, containers, screen, reactive
+from textual import app, containers, log, screen, widgets
+
 from quizzy import __version__, models
 
 
@@ -25,7 +26,6 @@ class AnswerScreen(screen.ModalScreen[models.Team | None]):
         self.border_title = f"{category} - {question.value} points"
 
     def compose(self) -> app.ComposeResult:
-
         question_widget = widgets.Static(self.question.question, id="question")
         question_widget.border_title = "Question"
 
@@ -33,8 +33,12 @@ class AnswerScreen(screen.ModalScreen[models.Team | None]):
         answer_widget.border_title = "Answer"
 
         whoanswered = containers.HorizontalGroup(
-            *[containers.Vertical(widgets.Button(team.name, id=team_id, variant="success")) for team_id, team in self.teams.items()],
-            id="who-answered", classes="horizontal-100",
+            *[
+                containers.Vertical(widgets.Button(team.name, id=team_id, variant="success"))
+                for team_id, team in self.teams.items()
+            ],
+            id="who-answered",
+            classes="horizontal-100",
         )
         whoanswered.border_title = "Who Answered Correctly?"
 
@@ -43,7 +47,9 @@ class AnswerScreen(screen.ModalScreen[models.Team | None]):
             answer_widget,
             whoanswered,
             containers.Horizontal(
-                widgets.Button("😭 No one answered correctly 😭", id=self.NOONE_ANSWERED_ID, variant="error", classes="button-100"),
+                widgets.Button(
+                    "😭 No one answered correctly 😭", id=self.NOONE_ANSWERED_ID, variant="error", classes="button-100"
+                ),
                 classes="horizontal-100",
             ),
             classes="question-answer-dialog",
@@ -77,7 +83,8 @@ class QuestionScreen(screen.ModalScreen[models.Team | None]):
         container = containers.Grid(
             question_widget,
             containers.Horizontal(
-                widgets.Button("Show Answer", id=self.SHOW_ANSWER_ID, variant="primary", classes="button-100"), classes="horizontal-100"
+                widgets.Button("Show Answer", id=self.SHOW_ANSWER_ID, variant="primary", classes="button-100"),
+                classes="horizontal-100",
             ),
             classes="question-answer-dialog",
             id="dialog",
@@ -87,15 +94,14 @@ class QuestionScreen(screen.ModalScreen[models.Team | None]):
         yield container
 
     def on_button_pressed(self, event: widgets.Button.Pressed) -> None:
+        def dismiss(team: models.Team | None) -> None:
+            self.dismiss(team)
 
         if event.button.id == self.SHOW_ANSWER_ID:
-            self.app.push_screen(
-                AnswerScreen(self.category, self.question, self.teams), lambda team_or_none: self.dismiss(team_or_none)
-            )
+            self.app.push_screen(AnswerScreen(self.category, self.question, self.teams), dismiss)
 
 
 class TeamScore(containers.Vertical):
-
     def __init__(self, team: models.Team) -> None:
         self.team = team
         super().__init__()
@@ -128,7 +134,11 @@ class QuestionButton(widgets.Button):
         self.disabled = True
 
         def wait_for_result(team: models.Team | None) -> None:
-            if team is not None:
+            if team is None:
+                log("question-button: No-one answered the question")
+            else:
+                log(f"question-button: {team.id} answered the question")
+
                 team.score += self.question.value
 
         self.app.push_screen(QuestionScreen(self.category, self.question, self.teams), wait_for_result)
