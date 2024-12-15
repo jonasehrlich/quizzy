@@ -89,6 +89,10 @@ CategoryColumn {
 
   Button {
     margin: 1;
+
+    &:disabled {
+      opacity: 0.5;
+    }
   }
 }
 
@@ -96,5 +100,3 @@ CategoryColumn {
   grid-size: 1 2;
   grid-rows: 1fr 5;
 }
-
-
