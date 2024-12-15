@@ -34,7 +34,7 @@ class AnswerScreen(screen.ModalScreen[models.Team | None]):
 
         whoanswered = containers.HorizontalGroup(
             *[
-                containers.Vertical(widgets.Button(team.name, id=team_id, variant="success"))
+                containers.Vertical(widgets.Button(team.name, id=team_id, variant="primary"))
                 for team_id, team in self.teams.items()
             ],
             id="who-answered",
