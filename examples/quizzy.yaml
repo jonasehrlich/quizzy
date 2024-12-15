@@ -12,10 +12,13 @@ categories:
         value: 200
   - name: "Science"
     questions:
-      - question: "What is the chemical symbol for gold?"
+      - question: "What is the _chemical_ **symbol** for [gold](https://duckduckgo.com/?t=ffab&q=gold)?"
         answer: "Au"
         value: 100
-      - question: "What is the chemical symbol for silver?"
-        answer: "Ag"
-        value: 200
+      - question: |
+          What is the chemical symbol for silver?
 
+          - We really need to know this one. And don't care about platinum which is Pt.
+          - Also not Helium which is He.
+        answer: "[Ag](https://en.wikipedia.org/wiki/Gold), that was easy **right**?"
+        value: 200

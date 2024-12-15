@@ -26,10 +26,10 @@ class AnswerScreen(screen.ModalScreen[models.Team | None]):
         self.border_title = f"{category} - {question.value} points"
 
     def compose(self) -> app.ComposeResult:
-        question_widget = widgets.Static(self.question.question, id="question")
+        question_widget = widgets.Markdown(self.question.question, id="question")
         question_widget.border_title = "Question"
 
-        answer_widget = widgets.Static(self.question.answer, id="answer")
+        answer_widget = widgets.Markdown(self.question.answer, id="answer")
         answer_widget.border_title = "Answer"
 
         whoanswered = containers.HorizontalGroup(
@@ -77,7 +77,7 @@ class QuestionScreen(screen.ModalScreen[models.Team | None]):
         self.teams = teams
 
     def compose(self) -> app.ComposeResult:
-        question_widget = widgets.Static(self.question.question, id="question")
+        question_widget = widgets.Markdown(self.question.question, id="question")
         question_widget.border_title = "Question"
 
         container = containers.Grid(
