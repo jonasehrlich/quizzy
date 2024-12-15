@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import pathlib
 
-from textual import app, containers, log, screen, widgets
+from textual import app, containers, log, message, reactive, screen, widgets
 
 from quizzy import __version__, models
 
@@ -22,7 +22,7 @@ class AnswerScreen(screen.ModalScreen[models.Team | None]):
         super().__init__(classes="question-answer-screen")
         self.category = category
         self.question = question
-        self.teams = {team.id(): team for team in teams}
+        self.teams = {team.id: team for team in teams}
         self.border_title = f"{category} - {question.value} points"
 
     def compose(self) -> app.ComposeResult:
@@ -102,44 +102,68 @@ class QuestionScreen(screen.ModalScreen[models.Team | None]):
 
 
 class TeamScore(containers.Vertical):
+
+    score = reactive.reactive(0, recompose=True)
+
     def __init__(self, team: models.Team) -> None:
         self.team = team
         super().__init__()
         self.border_title = self.team.name
+        self.score = team.score
 
     def compose(self) -> app.ComposeResult:
-        score = widgets.Static(str(self.team.score))
-        yield score
+        yield widgets.Static(str(self.score))
+
+    def watch_score(self, score: int) -> None:
+        """
+        Watch the reactive score and update the team's score in the data object. This allows dumping the quiz state
+        to YAML.
+        """
+        self.team.score = score
 
 
-class Scoreboard(containers.HorizontalGroup):
+class Scoreboard(containers.Vertical):
     def __init__(self, teams: list[models.Team]) -> None:
-        self.teams = teams
         super().__init__()
+        self.teams = teams
+        self.team_score_widgets = {team.id: TeamScore(team) for team in teams}
 
     def compose(self) -> app.ComposeResult:
-        for team in self.teams:
-            yield TeamScore(team)
+        yield containers.HorizontalGroup(*self.team_score_widgets.values())
+
+    def update_team_score(self, team_id: str, value: int) -> None:
+        log(f"scoreboard: Updating team score {team_id} to {value}")
+        self.team_score_widgets[team_id].score += value
 
 
 class QuestionButton(widgets.Button):
+
+    class Answered(message.Message):
+        def __init__(self, team: models.Team, question_value: int) -> None:
+            self.team = team
+            self.value = question_value
+            super().__init__()
+
     def __init__(self, category: str, question: models.Question, teams: list[models.Team]) -> None:
         self.question = question
         self.teams = teams
         self.category = category
         super().__init__(str(question.value), variant="warning", classes="button-100")
+        # Disable the button if the question has already been answered on init. This might be useful when starting with
+        # a state
+        self.disabled = question.answered
 
     def on_click(self) -> None:
         # First, disable the button to prevent multiple clicks
         self.disabled = True
+        self.question.answered = True
 
         def wait_for_result(team: models.Team | None) -> None:
             if team is None:
                 log("question-button: No-one answered the question")
             else:
                 log(f"question-button: {team.id} answered the question")
-
-                team.score += self.question.value
+                self.post_message(self.Answered(team, self.question.value))
 
         self.app.push_screen(QuestionScreen(self.category, self.question, self.teams), wait_for_result)
 
@@ -175,10 +199,12 @@ class QuizzyApp(app.App[None]):
         namespace = parser.parse_args()
 
         self.config = models.load_config(namespace.quizfile)
+        self.scoreboard_widget = Scoreboard(self.config.teams)
 
     def compose(self) -> app.ComposeResult:
         yield widgets.Header()
         yield widgets.Footer()
-        yield containers.Grid(
-            QuestionBoard(self.config), containers.Vertical(Scoreboard(self.config.teams)), id="app-grid"
-        )
+        yield containers.Grid(QuestionBoard(self.config), self.scoreboard_widget, id="app-grid")
+
+    def on_question_button_answered(self, event: QuestionButton.Answered) -> None:
+        self.scoreboard_widget.update_team_score(event.team.id, event.value)
