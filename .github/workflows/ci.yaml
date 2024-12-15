@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
         - uses: actions/checkout@v4
@@ -14,6 +14,6 @@ jobs:
           with:
             version: "0.5.9"
         - name: Ruff lint
-          run: uv run ruff check .
+          run: uv run ruff check
         - name: Ruff format
-          run: uv run ruff format --diff --check .
+          run: uv run ruff format --diff --check

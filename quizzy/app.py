@@ -102,7 +102,6 @@ class QuestionScreen(screen.ModalScreen[models.Team | None]):
 
 
 class TeamScore(containers.Vertical):
-
     score = reactive.reactive(0, recompose=True)
 
     def __init__(self, team: models.Team) -> None:
@@ -137,7 +136,6 @@ class Scoreboard(containers.Vertical):
 
 
 class QuestionButton(widgets.Button):
-
     class Answered(message.Message):
         def __init__(self, team: models.Team, question_value: int) -> None:
             self.team = team
