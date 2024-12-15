@@ -7,6 +7,7 @@ authors = [{ name = "Jonas Ehrlich", email = "jonas.ehrlich@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = ["pydantic>=2.10.3", "pyyaml>=6.0.2", "textual>=1.0.0"]
+license = "MIT"
 
 [project.scripts]
 quizzy = "quizzy.__main__:main"
