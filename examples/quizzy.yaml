@@ -1,0 +1,21 @@
+teams:
+  - name: "Team 1"
+  - name: "Team 2"
+categories:
+  - name: "General Knowledge"
+    questions:
+      - question: "What is the capital of France?"
+        answer: "Paris"
+        value: 100
+      - question: "What is the capital of Germany?"
+        answer: "Berlin"
+        value: 200
+  - name: "Science"
+    questions:
+      - question: "What is the chemical symbol for gold?"
+        answer: "Au"
+        value: 100
+      - question: "What is the chemical symbol for silver?"
+        answer: "Ag"
+        value: 200
+

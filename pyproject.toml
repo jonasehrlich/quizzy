@@ -9,7 +9,7 @@ requires-python = ">=3.12"
 dependencies = ["pydantic>=2.10.3", "pyyaml>=6.0.2", "textual>=1.0.0"]
 
 [project.scripts]
-quizzy = "quizzy.app:main"
+quizzy = "quizzy.__main__:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -17,4 +17,11 @@ build-backend = "hatchling.build"
 
 
 [dependency-groups]
-dev = ["black>=24.10.0", "isort>=5.13.2", "ruff>=0.8.3", "textual-dev>=1.7.0"]
+dev = [
+    "black>=24.10.0",
+    "isort>=5.13.2",
+    "pytest>=8.3.4",
+    "pytest-sugar>=1.0.0",
+    "ruff>=0.8.3",
+    "textual-dev>=1.7.0",
+]
