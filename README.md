@@ -37,13 +37,19 @@ See [examples/quizzy.yaml](examples/quizzy.yaml) for an example.
 
 ## Running it
 
-Run normally using *uv*:
+Run the latest PyPI release using *uvx*:
+
+```sh
+uvx quizzy projects/gh/quizzy/examples/quizzy.yaml
+```
+
+Run the local version using *uv*:
 
 ``` sh
 uv run quizzy examples/quizzy.yaml
 ```
 
-Serve using textual:
+Serve on a webserver using textual:
 
 ``` sh
 uv run textual serve "uv run quizzy examples/quizzy.yaml"
