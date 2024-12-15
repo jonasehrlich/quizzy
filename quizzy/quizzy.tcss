@@ -1,0 +1,100 @@
+TeamScore {
+  border: solid $primary;
+  align: center top;
+  height: 3;
+  margin: 1;
+}
+
+
+.question-answer-screen {
+  align: center middle;
+}
+
+.question-answer-dialog {
+
+  width: 80%;
+  height: 80%;
+  min-height: 60;
+  padding: 0 2;
+  border: solid $primary;
+  background: $surface;
+  content-align: center middle;
+
+  #question {
+    content-align: center middle;
+    padding: 2;
+    border: solid $foreground 80%;
+  }
+
+  #answer {
+    content-align: center middle;
+    padding: 2;
+    border: solid $success 80%;
+
+  }
+}
+
+QuestionScreen {
+  #dialog {
+    grid-size: 1;
+    grid-rows: 90% 6;
+  }
+}
+
+.horizontal-100 {
+  width: 100%;
+}
+
+Button.button-100 {
+  width: 100%;
+
+  &:focus {
+    /* Disable reversing for text of focussed full-width buttons */
+    text-style: bold;
+  }
+}
+
+AnswerScreen {
+  #dialog {
+    grid-size: 1;
+    grid-rows: 40% 40% 5 4;
+
+    #who-answered {
+      border: solid $foreground 80%;
+      Button {
+        margin: 0 1;
+        width: 100%;
+        &:focus {
+          /* Disable reversing for text of focussed buttons in the who-answered row */
+          text-style: bold;
+        }
+      }
+    }
+  }
+
+}
+
+QuestionBoard {
+  width: 100%;
+  padding: 5 0  0 0;
+  min-width: 50%;
+  align: center top;
+}
+
+CategoryColumn {
+  width: auto;
+  min-width: 30;
+  border: solid $secondary;
+  align: center middle;
+
+  Button {
+    margin: 1;
+  }
+}
+
+#app-grid {
+  grid-size: 1 2;
+  grid-rows: 1fr 5;
+}
+
+

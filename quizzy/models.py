@@ -16,6 +16,8 @@ class Team:
     def __str__(self) -> str:
         return self.name
 
+    def id(self) -> str:
+        return self.name.replace(" ", "_").lower()
 
 @dataclass
 class Question:
