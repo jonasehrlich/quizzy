@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v0.2.0
 
 * Added support for Markdown syntax in questions and answers
 

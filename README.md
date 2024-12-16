@@ -4,7 +4,6 @@ A quiz app using [textual](https://textual.textualize.io/).
 
 ![Question board](assets/question-board.png)
 
-
 ## Configuration and Questions
 
 Create a YAML file to define the teams participating, the questions and their answers.
@@ -33,7 +32,6 @@ categories:
 ```
 
 See [examples/quizzy.yaml](examples/quizzy.yaml) for an example.
-
 
 ## Running it
 
