@@ -1,4 +1,9 @@
+
 # Changelog
+
+## v0.3.1
+
+* Fixed the lockfile for this version
 
 ## v0.3.0
 
