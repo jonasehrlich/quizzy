@@ -57,6 +57,7 @@ class AnswerScreen(screen.ModalScreen[models.Team | None]):
         )
 
         container.border_title = f"{self.category} - {self.question.value} points"
+        yield widgets.Footer()
         yield container
 
     def on_button_pressed(self, event: widgets.Button.Pressed) -> None:
@@ -91,6 +92,7 @@ class QuestionScreen(screen.ModalScreen[models.Team | None]):
         )
 
         container.border_title = f"{self.category} - {self.question.value} points"
+        yield widgets.Footer()
         yield container
 
     def on_button_pressed(self, event: widgets.Button.Pressed) -> None:
