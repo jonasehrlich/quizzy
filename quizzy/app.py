@@ -133,7 +133,6 @@ class TeamScore(containers.Horizontal):
         self.score = team.score
 
     def compose(self) -> app.ComposeResult:
-
         yield widgets.Static(str(self.score))
         yield containers.Horizontal(
             widgets.Button("+ 100", id=self._ADD_BUTTON_ID, variant="success"),
@@ -191,7 +190,6 @@ class QuestionButton(widgets.Button):
         self.disabled = question.answered
 
     def on_click(self) -> None:
-
         def wait_for_result(team: QuestionScreenResult) -> None:
             if team is None:
                 return
