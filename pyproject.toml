@@ -1,7 +1,7 @@
 
 [project]
 name = "quizzy"
-version = "0.2.0"
+version = "0.3.0"
 description = "A Python TUI quiz app"
 authors = [{ name = "Jonas Ehrlich", email = "jonas.ehrlich@gmail.com" }]
 readme = "README.md"

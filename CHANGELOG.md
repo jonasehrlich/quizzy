@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.3.0
+
+* Add *Escape* keybinding to dismiss question and answer modals
+* Add score modifier buttons
+
 ## v0.2.0
 
 * Added support for Markdown syntax in questions and answers
