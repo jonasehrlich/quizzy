@@ -3,9 +3,12 @@ from __future__ import annotations
 import argparse
 import pathlib
 
-from textual import app, containers, log, message, reactive, screen, widgets
+from textual import app, binding, containers, log, message, reactive, screen, widgets
 
 from quizzy import __version__, models
+
+NoCorrectAnswerType = type("NoCorrectAnswerType", (object,), {})
+NoCorrectAnswer = NoCorrectAnswerType()
 
 
 def get_arg_parser() -> argparse.ArgumentParser:
@@ -15,8 +18,15 @@ def get_arg_parser() -> argparse.ArgumentParser:
     return parser
 
 
-class AnswerScreen(screen.ModalScreen[models.Team | None]):
+QuestionScreenResult = models.Team | NoCorrectAnswerType | None
+
+
+class AnswerScreen(screen.ModalScreen[QuestionScreenResult], can_focus=True):
     NOONE_ANSWERED_ID = "__noone-answered"
+
+    BINDINGS = [
+        binding.Binding("escape", "no_correct_answer", "Dismiss", key_display="Esc"),
+    ]
 
     def __init__(self, category: str, question: models.Question, teams: list[models.Team]) -> None:
         super().__init__(classes="question-answer-screen")
@@ -32,7 +42,7 @@ class AnswerScreen(screen.ModalScreen[models.Team | None]):
         answer_widget = widgets.Markdown(self.question.answer, id="answer")
         answer_widget.border_title = "Answer"
 
-        whoanswered = containers.HorizontalGroup(
+        who_answered = containers.HorizontalGroup(
             *[
                 containers.Vertical(widgets.Button(team.name, id=team_id, variant="primary"))
                 for team_id, team in self.teams.items()
@@ -40,12 +50,12 @@ class AnswerScreen(screen.ModalScreen[models.Team | None]):
             id="who-answered",
             classes="horizontal-100",
         )
-        whoanswered.border_title = "Who Answered Correctly?"
+        who_answered.border_title = "Who Answered Correctly?"
 
         container = containers.Grid(
             question_widget,
             answer_widget,
-            whoanswered,
+            who_answered,
             containers.Horizontal(
                 widgets.Button(
                     "😭 No one answered correctly 😭", id=self.NOONE_ANSWERED_ID, variant="error", classes="button-100"
@@ -60,16 +70,22 @@ class AnswerScreen(screen.ModalScreen[models.Team | None]):
         yield widgets.Footer()
         yield container
 
+    def action_no_correct_answer(self) -> None:
+        self.dismiss(NoCorrectAnswer)
+
     def on_button_pressed(self, event: widgets.Button.Pressed) -> None:
         if event.button.id == self.NOONE_ANSWERED_ID:
-            self.dismiss(None)
+            self.dismiss(NoCorrectAnswer)
         elif event.button.id in self.teams:
             team = self.teams[event.button.id]
             self.dismiss(team)
 
 
-class QuestionScreen(screen.ModalScreen[models.Team | None]):
+class QuestionScreen(screen.ModalScreen[QuestionScreenResult], can_focus=True):
     SHOW_ANSWER_ID = "show-answer"
+    BINDINGS = [
+        binding.Binding("escape", "dismiss(None)", "Dismiss"),
+    ]
 
     def __init__(self, category: str, question: models.Question, teams: list[models.Team]) -> None:
         super().__init__(classes="question-answer-screen")
@@ -96,7 +112,7 @@ class QuestionScreen(screen.ModalScreen[models.Team | None]):
         yield container
 
     def on_button_pressed(self, event: widgets.Button.Pressed) -> None:
-        def dismiss(team: models.Team | None) -> None:
+        def dismiss(team: QuestionScreenResult) -> None:
             self.dismiss(team)
 
         if event.button.id == self.SHOW_ANSWER_ID:
@@ -175,13 +191,15 @@ class QuestionButton(widgets.Button):
         self.disabled = question.answered
 
     def on_click(self) -> None:
-        # First, disable the button to prevent multiple clicks
-        self.disabled = True
-        self.question.answered = True
 
-        def wait_for_result(team: models.Team | None) -> None:
+        def wait_for_result(team: QuestionScreenResult) -> None:
             if team is None:
-                log("question-button: No-one answered the question")
+                return
+            # First, disable the button to prevent multiple clicks
+            self.disabled = True
+            self.question.answered = True
+            if isinstance(team, NoCorrectAnswerType):
+                log("question-button: No one answered the question")
             else:
                 log(f"question-button: {team.id} answered the question")
                 self.post_message(self.Answered(team, self.question.value))
