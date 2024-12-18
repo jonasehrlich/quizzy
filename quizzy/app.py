@@ -98,10 +98,14 @@ class QuestionScreen(screen.ModalScreen[models.Team | None]):
             self.dismiss(team)
 
         if event.button.id == self.SHOW_ANSWER_ID:
+            event.stop()
             self.app.push_screen(AnswerScreen(self.category, self.question, self.teams), dismiss)
 
 
-class TeamScore(containers.Vertical):
+class TeamScore(containers.Horizontal):
+    MODIFIER_BUTTON_VALUE = 100
+    _ADD_BUTTON_ID = f"add-{MODIFIER_BUTTON_VALUE}"
+    _SUBTRACT_BUTTON_ID = f"subtract-{MODIFIER_BUTTON_VALUE}"
     score = reactive.reactive(0, recompose=True)
 
     def __init__(self, team: models.Team) -> None:
@@ -111,7 +115,24 @@ class TeamScore(containers.Vertical):
         self.score = team.score
 
     def compose(self) -> app.ComposeResult:
+
         yield widgets.Static(str(self.score))
+        yield containers.Horizontal(
+            widgets.Button("+ 100", id=self._ADD_BUTTON_ID, variant="success"),
+            widgets.Button("- 100", id=self._SUBTRACT_BUTTON_ID, variant="error"),
+            classes="modifier-buttons-container",
+        )
+
+    def on_button_pressed(self, event: widgets.Button.Pressed) -> None:
+        if event.button.id == self._ADD_BUTTON_ID:
+            self.score += self.MODIFIER_BUTTON_VALUE
+            event.stop()
+        elif event.button.id == self._SUBTRACT_BUTTON_ID:
+            if self.score <= self.MODIFIER_BUTTON_VALUE:
+                self.score = 0
+            else:
+                self.score -= self.MODIFIER_BUTTON_VALUE
+            event.stop()
 
     def watch_score(self, score: int) -> None:
         """
@@ -206,3 +227,6 @@ class QuizzyApp(app.App[None]):
 
     def on_question_button_answered(self, event: QuestionButton.Answered) -> None:
         self.scoreboard_widget.update_team_score(event.team.id, event.value)
+
+    def on_mount(self) -> None:
+        self.theme = "textual-light"

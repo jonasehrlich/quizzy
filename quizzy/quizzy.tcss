@@ -1,8 +1,28 @@
 TeamScore {
-  border: solid $primary;
+  border: round $primary;
   align: center top;
   height: 3;
   margin: 1;
+
+  Static {
+    max-width: 50%;
+  }
+
+  Horizontal.modifier-buttons-container {
+    align:  right middle;
+
+    Button {
+      margin: 0 2;
+      padding: 0;
+      min-width: 8;
+      border: none;
+      width: 8;
+      &:focus {
+        /* Disable reversing for text of focussed buttons in the team score row */
+        text-style: bold;
+      }
+    }
+  }
 }
 
 
@@ -15,20 +35,20 @@ TeamScore {
   height: 80%;
   min-height: 40;
   padding: 0 2;
-  border: solid $primary;
+  border: round $primary;
   background: $surface;
   content-align: center middle;
 
   #question {
     content-align: center middle;
     padding: 2;
-    border: solid $foreground 80%;
+    border: round $foreground 80%;
   }
 
   #answer {
     content-align: center middle;
     padding: 2;
-    border: solid $success 80%;
+    border: round $success 80%;
 
   }
 }
@@ -59,7 +79,7 @@ AnswerScreen {
     grid-rows: 40% 40% 5 4;
 
     #who-answered {
-      border: solid $foreground 80%;
+      border: round $foreground 80%;
       Button {
         margin: 0 1;
         width: 100%;
