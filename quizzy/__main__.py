@@ -1,9 +1,3 @@
-from quizzy.app import QuizzyApp
+from quizzy.app import main
 
-
-def main() -> None:
-    QuizzyApp().run()
-
-
-if __name__ == "__main__":
-    main()
+main()

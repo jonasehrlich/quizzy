@@ -230,12 +230,9 @@ class QuestionBoard(containers.HorizontalGroup):
 class QuizzyApp(app.App[None]):
     CSS_PATH = "quizzy.tcss"
 
-    def __init__(self) -> None:
+    def __init__(self, config: models.Config) -> None:
         super().__init__()
-        parser = get_arg_parser()
-        namespace = parser.parse_args()
-
-        self.config = models.load_config(namespace.quizfile)
+        self.config = config
         self.scoreboard_widget = Scoreboard(self.config.teams)
 
     def compose(self) -> app.ComposeResult:
@@ -248,3 +245,12 @@ class QuizzyApp(app.App[None]):
 
     def on_mount(self) -> None:
         self.theme = "textual-light"
+
+
+def main() -> None:
+    parser = get_arg_parser()
+    namespace = parser.parse_args()
+
+    config = models.load_config(namespace.quizfile)
+    app = QuizzyApp(config)
+    app.run()
