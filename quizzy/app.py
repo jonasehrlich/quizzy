@@ -2,21 +2,17 @@ from __future__ import annotations
 
 import argparse
 import pathlib
+import shlex
+import sys
+from typing import NoReturn
 
 from textual import app, binding, containers, log, message, reactive, screen, widgets
+from textual_serve import server
 
 from quizzy import __version__, models
 
 NoCorrectAnswerType = type("NoCorrectAnswerType", (object,), {})
 NoCorrectAnswer = NoCorrectAnswerType()
-
-
-def get_arg_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog=__name__.split(".")[0], description="A terminal quiz app")
-    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
-    parser.add_argument("quizfile", type=pathlib.Path, help="Quiz file")
-    return parser
-
 
 QuestionScreenResult = models.Team | NoCorrectAnswerType | None
 
@@ -247,10 +243,31 @@ class QuizzyApp(app.App[None]):
         self.theme = "textual-light"
 
 
-def main() -> None:
+def get_arg_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog=__name__.split(".")[0], description="A terminal quiz app")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
+
+    serve_group = parser.add_argument_group("Serve options")
+    serve_group.add_argument("--serve", action="store_true", help="Serve the app through the browser")
+    serve_group.add_argument("--host", default="localhost", help="Host to serve the app on")
+    serve_group.add_argument("--port", type=int, default=8000, help="Port to serve the app on")
+
+    parser.add_argument("quizfile", type=pathlib.Path, help="Quiz file")
+    return parser
+
+
+def main() -> NoReturn:
     parser = get_arg_parser()
     namespace = parser.parse_args()
 
-    config = models.load_config(namespace.quizfile)
-    app = QuizzyApp(config)
-    app.run()
+    if namespace.serve:
+        # The --serve flag is set, drop it from the args and serve the app instead through textual-serve
+        args = list(sys.argv)
+        args.remove("--serve")
+
+        server.Server(shlex.join(args), host=namespace.host, port=namespace.port).serve()
+    else:
+        config = models.load_config(namespace.quizfile)
+        app = QuizzyApp(config)
+        app.run()
+    sys.exit(0)

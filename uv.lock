@@ -846,6 +846,7 @@ dependencies = [
     { name = "pydantic" },
     { name = "pyyaml" },
     { name = "textual" },
+    { name = "textual-serve" },
 ]
 
 [package.dev-dependencies]
@@ -863,6 +864,7 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.10.3" },
     { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "textual", specifier = ">=1.0.0" },
+    { name = "textual-serve", specifier = ">=1.1.1" },
 ]
 
 [package.metadata.requires-dev]

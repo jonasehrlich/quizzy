@@ -6,7 +6,12 @@ description = "A Python TUI quiz app"
 authors = [{ name = "Jonas Ehrlich", email = "jonas.ehrlich@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = ["pydantic>=2.10.3", "pyyaml>=6.0.2", "textual>=1.0.0"]
+dependencies = [
+    "pydantic>=2.10.3",
+    "pyyaml>=6.0.2",
+    "textual-serve>=1.1.1",
+    "textual>=1.0.0",
+]
 license = "MIT"
 
 [project.scripts]

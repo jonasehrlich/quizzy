@@ -50,7 +50,7 @@ uv run quizzy examples/quizzy.yaml
 Serve on a webserver using textual:
 
 ``` sh
-uv run textual serve "uv run quizzy examples/quizzy.yaml"
+uvx quizzy --serve examples/quizzy.yaml
 ```
 
 Run in development mode:

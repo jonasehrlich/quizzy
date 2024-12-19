@@ -1,6 +1,10 @@
 
 # Changelog
 
+## v0.4.0
+
+* Add `--serve` flag to serve the application in a browser
+
 ## v0.3.1
 
 * Fixed the lockfile for this version
