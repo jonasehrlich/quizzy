@@ -1,6 +1,10 @@
 
 # Changelog
 
+## v0.5.0
+
+* Save state of unfinished quizzes to continue at a later point
+
 ## v0.4.0
 
 * Add `--serve` flag to serve the application in a browser
