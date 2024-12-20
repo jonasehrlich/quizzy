@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import json
 import pathlib
-from typing import Self
+from typing import Annotated, Any, Self
 
+import pydantic
 import yaml
 from pydantic import Field, model_validator
 from pydantic.dataclasses import dataclass
@@ -21,12 +23,20 @@ class Team:
         return self.name
 
 
+def is_multiple_of_100(v: int) -> int:
+    if v % 100 != 0:
+        raise ValueError("Value must be a multiple of 100")
+    return v
+
+
 @dataclass
 class Question:
-    question: str
-    answer: str
-    value: int = Field(gt=0)
-    answered: bool = False
+    question: str = Field(description="The question to ask. Markdown is supported.")
+    answer: str = Field(description="The answer to the question. Markdown is supported.")
+    value: Annotated[int, pydantic.AfterValidator(is_multiple_of_100)] = Field(
+        gt=0, description="The value of the question in points. Must be a multiple of 100."
+    )
+    answered: bool = Field(default=False, description="Whether the question has been answered already.")
 
     def __str__(self) -> str:
         return self.question
@@ -34,8 +44,8 @@ class Question:
 
 @dataclass
 class Category:
-    name: str
-    questions: list[Question] = Field(max_length=5)
+    name: str = Field(description="The name of the category.")
+    questions: list[Question] = Field(max_length=5, description="The questions in this category.")
 
     @model_validator(mode="after")
     def sort_questions(self) -> Self:
@@ -47,13 +57,26 @@ class Category:
 
 @dataclass
 class Config:
-    categories: list[Category] = Field(max_length=5)
-    teams: list[Team] = Field(default=[Team("Team 1"), Team("Team 2")])
-    # TODO: Support random questions
+    categories: list[Category] = Field(max_length=5, description="The categories in the quiz.")
+    teams: list[Team] = Field(default=[Team("Team 1"), Team("Team 2")], description="The teams in the quiz.")
+
+
+def _get_dict(path: pathlib.Path) -> dict[str, Any]:
+    """Get the dictionary from a file.
+
+    :param path: Path of the file to load.
+    :raises ValueError: Raised if the file format is not supported.
+    :return: Dictionary with the contents of the file.
+    """
+    with path.open() as f:
+        if path.suffix == ".json":
+            return json.load(f)
+        if path.suffix in {".yml", ".yaml"}:
+            return yaml.safe_load(f)
+        raise ValueError(f"Unsupported file format: {path.suffix}")
 
 
 def load_config(path: pathlib.Path) -> Config:
-    with path.open() as f:
-        raw = yaml.safe_load(f)
+    raw = _get_dict(path)
 
     return Config(**raw)
