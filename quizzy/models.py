@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import json
 import pathlib
 from typing import Annotated, Any, Self
@@ -60,6 +61,13 @@ class Config:
     categories: list[Category] = Field(max_length=5, description="The categories in the quiz.")
     teams: list[Team] = Field(default=[Team("Team 1"), Team("Team 2")], description="The teams in the quiz.")
 
+    def is_finished(self) -> bool:
+        for category in self.categories:
+            for question in category.questions:
+                if not question.answered:
+                    return False
+        return True
+
 
 def _get_dict(path: pathlib.Path) -> dict[str, Any]:
     """Get the dictionary from a file.
@@ -78,5 +86,18 @@ def _get_dict(path: pathlib.Path) -> dict[str, Any]:
 
 def load_config(path: pathlib.Path) -> Config:
     raw = _get_dict(path)
-
     return Config(**raw)
+
+
+def dump_config_if_not_finished(config: Config) -> None:
+    """Dump the config if any of the questions is not answered yet.
+
+    :param config: _description_
+    """
+    if config.is_finished():
+        return
+    p = pathlib.Path() / f"quizzy-run-{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}.json"
+    print(f"This quiz is not finished yet. Saving current state to '{p}'.")
+    print("This file can be re-used later.")
+    with p.open("wb") as f:
+        f.write(pydantic.TypeAdapter(Config).dump_json(config))

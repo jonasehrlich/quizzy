@@ -189,7 +189,7 @@ class QuestionButton(widgets.Button):
         def wait_for_result(team: QuestionScreenResult) -> None:
             if team is None:
                 return
-            # First, disable the button to prevent multiple clicks
+
             self.disabled = True
             self.question.answered = True
             if isinstance(team, NoCorrectAnswerType):
@@ -244,7 +244,15 @@ class QuizzyApp(app.App[None]):
 
 
 def get_arg_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog=__name__.split(".")[0], description="A terminal quiz app")
+    parser = argparse.ArgumentParser(
+        prog=__name__.split(".")[0],
+        description="A quiz app to run in the terminal or the browser",
+        epilog=(
+            "When an unfinished quiz is closed, the state is saved to a timestamped quiz file in the current working "
+            "directory."
+        ),
+    )
+
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
 
     serve_group = parser.add_argument_group("Serve options")
@@ -256,18 +264,44 @@ def get_arg_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def serve_app(host: str, port: int) -> None:
+    """Serve the app through textual-serve.
+
+    :param host: Host to serve the app on
+    :param port: Port to serve the app on
+    """
+    # The --serve flag is set, drop it from the args and serve the app instead through textual-serve
+    args = list(sys.argv)
+    args.remove("--serve")
+
+    server.Server(shlex.join(args), host=host, port=port).serve()
+
+
+def run_app(
+    quiz_file: pathlib.Path,
+) -> None:
+    """Run the app in the terminal.
+
+    :param quizfile: File to use for this quiz
+    """
+    try:
+        config = models.load_config(quiz_file)
+    except Exception as e:
+        print(f"Error loading quiz file: {e}", file=sys.stderr)
+        sys.exit(1)
+    app = QuizzyApp(config)
+    try:
+        app.run()
+    finally:
+        models.dump_config_if_not_finished(config)
+
+
 def main() -> NoReturn:
     parser = get_arg_parser()
     namespace = parser.parse_args()
 
     if namespace.serve:
-        # The --serve flag is set, drop it from the args and serve the app instead through textual-serve
-        args = list(sys.argv)
-        args.remove("--serve")
-
-        server.Server(shlex.join(args), host=namespace.host, port=namespace.port).serve()
+        serve_app(namespace.host, namespace.port)
     else:
-        config = models.load_config(namespace.quizfile)
-        app = QuizzyApp(config)
-        app.run()
+        run_app(namespace.quizfile)
     sys.exit(0)
