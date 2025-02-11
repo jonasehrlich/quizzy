@@ -2,7 +2,7 @@
 
 A quiz app using [textual](https://textual.textualize.io/).
 
-![Question board](assets/question-board.png)
+![Question board](httpsassets/game.gif)
 
 ## Configuration and Questions
 
