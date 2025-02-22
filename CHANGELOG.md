@@ -1,9 +1,13 @@
 
 # Changelog
 
+## v0.6.0
+
+* Only dump game state on exit with `--dump-state-on-exit`
+
 ## v0.5.0
 
-* Save state of unfinished quizzes to continue at a later point
+* Dump game state on exit by default
 
 ## v0.4.0
 

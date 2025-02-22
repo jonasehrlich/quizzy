@@ -254,6 +254,7 @@ def get_arg_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
+    parser.add_argument("--dump-state-on-exit", action="store_true", help="Dump game state on exit")
 
     serve_group = parser.add_argument_group("Serve options")
     serve_group.add_argument("--serve", action="store_true", help="Serve the app through the browser")
@@ -277,9 +278,7 @@ def serve_app(host: str, port: int) -> None:
     server.Server(shlex.join(args), host=host, port=port).serve()
 
 
-def run_app(
-    quiz_file: pathlib.Path,
-) -> None:
+def run_app(quiz_file: pathlib.Path, dump_state_on_exit: bool = False) -> None:
     """Run the app in the terminal.
 
     :param quizfile: File to use for this quiz
@@ -293,7 +292,8 @@ def run_app(
     try:
         app.run()
     finally:
-        models.dump_config_if_not_finished(config)
+        if dump_state_on_exit:
+            models.dump_config_if_not_finished(config)
 
 
 def main() -> NoReturn:
@@ -303,5 +303,5 @@ def main() -> NoReturn:
     if namespace.serve:
         serve_app(namespace.host, namespace.port)
     else:
-        run_app(namespace.quizfile)
+        run_app(namespace.quizfile, namespace.dump_state_on_exit)
     sys.exit(0)
